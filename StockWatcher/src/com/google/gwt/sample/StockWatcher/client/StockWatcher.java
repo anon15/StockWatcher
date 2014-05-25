@@ -1,5 +1,7 @@
 package com.google.gwt.sample.StockWatcher.client;
 
+import java.util.ArrayList;
+
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -17,12 +19,16 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class StockWatcher implements EntryPoint {
 		
-	VerticalPanel pnlMain;
-	HorizontalPanel pnlAddStockWatch;
-	Button btnAddStock;
-	TextBox txtAddStock;
-	Label lblTimeStamp;
-	FlexTable tblStockWatch;
+	private VerticalPanel pnlMain;
+	private HorizontalPanel pnlAddStockWatch;
+	private Button btnAddStock;
+	private TextBox txtAddStock;
+	private Label lblTimeStamp;
+	private FlexTable tblStockWatch;
+	
+	private ArrayList<String> stocks;
+	
+	
 	
 	public void onModuleLoad() {
 		init();
@@ -72,6 +78,8 @@ public class StockWatcher implements EntryPoint {
 		pnlMain.add(pnlAddStockWatch);
 		pnlMain.add(lblTimeStamp);
 		
+		stocks = new ArrayList<>();
+		
 		txtAddStock.setFocus(true);
 		
 	}
@@ -88,12 +96,42 @@ public class StockWatcher implements EntryPoint {
 		if(!this.validateUsersStockInput(usersInput)){
 			Window.alert("Your input is not valid");
 		}
+		else{
+			stocks.add(usersInput);
+			int rowNumber = this.tblStockWatch.getRowCount()+1;
+			this.tblStockWatch.setText(rowNumber, 0, usersInput);
+			Button btnRemove = new Button("X");
+			btnRemove.addClickHandler(new ClickHandler() {
+				
+				@Override
+				public void onClick(ClickEvent event) {
+					int removeIndex = stocks.indexOf(usersInput);
+					//remove stock from list
+					stocks.remove(removeIndex);
+					//remove stock from table
+					tblStockWatch.removeRow(removeIndex+1);
+					
+				}
+			});
+			
+			//add Remove button to row for deleting the stock
+			this.tblStockWatch.setWidget(rowNumber, 3, btnRemove);
+			
+			/*
+			//check if there is stock like users input in the list
+			if(!stocks.contains(usersInput)){
+				addStock(usersInput);
+			}
+			else{
+				Window.alert("Stock already available in the list");
+			}*/
+		}
 		
 		//TODO add stock to table
 		//TODO add remove button to row
 		//TODO get the stock price
 	}
-	
+
 	/**
 	 * Checks if user's new stock input value is valid
 	 * @param user's stock value input
